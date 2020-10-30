@@ -15,11 +15,17 @@ export function getProductListHandler(repo: ProductListGetter): APIGatewayProxyH
 
       return {
         statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
         body: JSON.stringify(products),
       };
     } catch (err) {
 
       return {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
         statusCode: 500,
         body: JSON.stringify({
           message: err.message,

@@ -17,18 +17,27 @@ export function getProductByIdHandler(repo: ProductByIdGetter): APIGatewayProxyH
 
       if (!product) {
         return {
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+          },
           statusCode: 404,
           body: 'Product not found'
         }
       }
 
       return {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
         statusCode: 200,
         body: JSON.stringify(product),
       };
     } catch (err) {
 
       return {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
         statusCode: 500,
         body: JSON.stringify({
           message: err.message,
