@@ -1,7 +1,7 @@
 import { APIGatewayProxyHandler, } from 'aws-lambda';
 import 'source-map-support/register';
 import { ProductRepository } from "../repository/product";
-import { Product } from "../repository/product.interface";
+import { Product } from "../repository/product.type";
 
 interface ProductListGetter {
   getProductList(): Promise<Product[]>

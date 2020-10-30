@@ -18,7 +18,7 @@ const serverlessConfiguration: Serverless = {
     webpack: {
       webpackConfig: './webpack.config.js',
       includeModules: true,
-      keepOutputDirectory: true,
+      // keepOutputDirectory: true,
     }
   },
 

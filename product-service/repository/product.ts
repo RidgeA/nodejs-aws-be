@@ -1,5 +1,5 @@
 import { promises } from 'fs';
-import { Product } from './product.interface';
+import { Product } from './product.type';
 
 const readFile = promises.readFile;
 
