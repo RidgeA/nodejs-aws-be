@@ -1,4 +1,4 @@
-import type { Serverless } from 'serverless/aws';
+import type { Serverless, } from 'serverless/aws';
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -10,7 +10,7 @@ const serverlessConfiguration: Serverless = {
   package: {
     include: [
       'repository/products-mock-data.json',
-      'tsconfig.json'
+      'tsconfig.json',
     ],
   },
   frameworkVersion: '2',
@@ -19,11 +19,11 @@ const serverlessConfiguration: Serverless = {
       webpackConfig: './webpack.config.js',
       includeModules: true,
       // keepOutputDirectory: true,
-    }
+    },
   },
 
   // Add the serverless-webpack plugin
-  plugins: ['serverless-webpack'],
+  plugins: ['serverless-webpack',],
 
   provider: {
     name: 'aws',
@@ -46,9 +46,9 @@ const serverlessConfiguration: Serverless = {
             method: 'get',
             path: 'products',
             cors: true,
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     getProductById: {
       handler: 'handler.getProductById',
@@ -58,11 +58,11 @@ const serverlessConfiguration: Serverless = {
             method: 'get',
             path: 'products/{id}',
             cors: true,
-          }
-        }
-      ]
-    }
-  }
-}
+          },
+        },
+      ],
+    },
+  },
+};
 
 module.exports = serverlessConfiguration;

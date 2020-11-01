@@ -1,8 +1,8 @@
 import { APIGatewayProxyHandler, } from 'aws-lambda';
 import 'source-map-support/register';
-import { ProductRepository } from "../repository/product";
-import { Product } from "../repository/product.type";
-import { StatusCodes } from 'http-status-codes';
+import { ProductRepository, } from "../repository/product";
+import { Product, } from "../repository/product.type";
+import { StatusCodes, } from 'http-status-codes';
 
 interface ProductListGetter {
   getProductList(): Promise<Product[]>
@@ -12,7 +12,7 @@ export function getProductListHandler(repo: ProductListGetter): APIGatewayProxyH
 
   return async () => {
     try {
-      const products = await repo.getProductList()
+      const products = await repo.getProductList();
 
       return {
         headers: {
@@ -30,10 +30,10 @@ export function getProductListHandler(repo: ProductListGetter): APIGatewayProxyH
         statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
         body: JSON.stringify({
           message: err.message,
-        })
-      }
+        }),
+      };
     }
-  }
+  };
 }
 
 export const getProductList: APIGatewayProxyHandler = getProductListHandler(new ProductRepository());

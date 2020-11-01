@@ -1,5 +1,5 @@
-import { promises } from 'fs';
-import { Product } from './product.type';
+import { promises, } from 'fs';
+import { Product, } from './product.type';
 
 const readFile = promises.readFile;
 
@@ -9,11 +9,11 @@ const once = (fn) => {
     if (!cached) {
       cached = await fn.call(null, args);
     }
-    return cached
-  }
-}
+    return cached;
+  };
+};
 
-const loadData = once(() => readFile('products-mock-data.json', 'utf8').then(JSON.parse))
+const loadData = once(() => readFile('products-mock-data.json', 'utf8').then(JSON.parse));
 
 export class ProductRepository {
   async getProductList(): Promise<Product[]> {

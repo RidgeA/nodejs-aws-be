@@ -1,8 +1,8 @@
-import { APIGatewayProxyResult } from "aws-lambda";
-import { name } from '../package.json';
-import { Product } from "../repository/product.type";
-import { getProductListHandler } from './get-product-list';
-import { StatusCodes } from 'http-status-codes';
+import { APIGatewayProxyResult, } from "aws-lambda";
+import { name, } from '../package.json';
+import { Product, } from "../repository/product.type";
+import { getProductListHandler, } from './get-product-list';
+import { StatusCodes, } from 'http-status-codes';
 
 describe(name, () => {
 
@@ -28,8 +28,8 @@ describe(name, () => {
               id: "3a24dece-d71e-46e7-85b4-d0ca9e00c3e1",
             },
           ]);
-        }
-      }
+        },
+      };
 
       const handler = getProductListHandler(repository);
 
@@ -37,7 +37,7 @@ describe(name, () => {
 
       expect(actual).toHaveProperty('statusCode', StatusCodes.OK);
       expect(typeof actual.body).toBe('string');
-      expect(_ => JSON.parse(actual.body)).not.toThrow();
+      expect(() => JSON.parse(actual.body)).not.toThrow();
     });
 
     it('should return 500 status code if some error happened', async () => {
@@ -45,8 +45,8 @@ describe(name, () => {
       const repository = {
         getProductList(): Promise<Product[]> {
           return Promise.reject(new Error('some error'));
-        }
-      }
+        },
+      };
 
       const handler = getProductListHandler(repository);
 
@@ -56,5 +56,5 @@ describe(name, () => {
       expect(typeof actual.body).toBe('string');
     });
 
-  })
-})
+  });
+});

@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
     "postinstall": "husky install && cd product-service && npm install",
-    "commit:check": "npm run test"
+    "commit:check": "npm run test && npm run lint"
   },
   "repository": {
     "type": "git",
@@ -23,7 +25,10 @@
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-typescript": "^7.12.1",
     "@types/jest": "^26.0.15",
+    "@typescript-eslint/eslint-plugin": "^4.6.0",
+    "@typescript-eslint/parser": "^4.6.0",
     "babel-jest": "^26.6.1",
+    "eslint": "^7.12.1",
     "husky": "^5.0.0-beta.0",
     "jest": "^26.6.1",
     "ts-node": "^9.0.0"
