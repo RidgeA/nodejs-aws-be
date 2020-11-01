@@ -2,6 +2,7 @@ import { APIGatewayProxyHandler, } from 'aws-lambda';
 import 'source-map-support/register';
 import { ProductRepository } from "../repository/product";
 import { Product } from "../repository/product.type";
+import { StatusCodes } from 'http-status-codes';
 
 interface ProductByIdGetter {
   getProductById(id: string): Promise<Product>
@@ -20,7 +21,7 @@ export function getProductByIdHandler(repo: ProductByIdGetter): APIGatewayProxyH
           headers: {
             'Access-Control-Allow-Origin': '*',
           },
-          statusCode: 404,
+          statusCode: StatusCodes.NOT_FOUND,
           body: 'Product not found'
         }
       }
@@ -29,7 +30,7 @@ export function getProductByIdHandler(repo: ProductByIdGetter): APIGatewayProxyH
         headers: {
           'Access-Control-Allow-Origin': '*',
         },
-        statusCode: 200,
+        statusCode: StatusCodes.OK,
         body: JSON.stringify(product),
       };
     } catch (err) {
@@ -38,7 +39,7 @@ export function getProductByIdHandler(repo: ProductByIdGetter): APIGatewayProxyH
         headers: {
           'Access-Control-Allow-Origin': '*',
         },
-        statusCode: 500,
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
         body: JSON.stringify({
           message: err.message,
         })
@@ -48,3 +49,4 @@ export function getProductByIdHandler(repo: ProductByIdGetter): APIGatewayProxyH
 }
 
 export const getProductById: APIGatewayProxyHandler = getProductByIdHandler(new ProductRepository());
+
