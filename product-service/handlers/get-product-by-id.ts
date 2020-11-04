@@ -1,22 +1,32 @@
-import { APIGatewayProxyHandler, } from 'aws-lambda';
+import { APIGatewayProxyHandler } from 'aws-lambda';
+import { StatusCodes } from 'http-status-codes';
+import { NotFoundError } from "slonik";
 import 'source-map-support/register';
-import { ProductRepository, } from "../repository/product";
-import { Product, } from "../repository/product.type";
-import { StatusCodes, } from 'http-status-codes';
+import { ProductRepository } from "../repository/product/product";
+import { Queries } from "../repository/product/product-query";
+import { Product } from "../repository/product/product.type";
 
 interface ProductByIdGetter {
-  getProductById(id: string): Promise<Product>
+  findOne(Query): Promise<Product>
 }
 
 export function getProductByIdHandler(repo: ProductByIdGetter): APIGatewayProxyHandler {
 
   return async (event) => {
     try {
-      const { id, } = event.pathParameters;
+      const { id } = event.pathParameters;
 
-      const product = await repo.getProductById(id);
+      const product = await repo.findOne(Queries.getProductById(id));
 
-      if (!product) {
+      return {
+        headers: {},
+        statusCode: StatusCodes.OK,
+        body: JSON.stringify(product),
+      };
+    } catch (err) {
+
+      if (err instanceof NotFoundError) {
+
         return {
           headers: {
             'Access-Control-Allow-Origin': '*',
@@ -25,15 +35,6 @@ export function getProductByIdHandler(repo: ProductByIdGetter): APIGatewayProxyH
           body: 'Product not found',
         };
       }
-
-      return {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        },
-        statusCode: StatusCodes.OK,
-        body: JSON.stringify(product),
-      };
-    } catch (err) {
 
       return {
         headers: {

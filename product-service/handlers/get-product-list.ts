@@ -1,18 +1,20 @@
-import { APIGatewayProxyHandler, } from 'aws-lambda';
 import 'source-map-support/register';
-import { ProductRepository, } from "../repository/product";
-import { Product, } from "../repository/product.type";
-import { StatusCodes, } from 'http-status-codes';
+
+import { APIGatewayProxyHandler } from 'aws-lambda';
+import { StatusCodes } from 'http-status-codes';
+import { ProductRepository } from "../repository/product/product";
+import { Queries } from "../repository/product/product-query";
+import { Product } from "../repository/product/product.type";
 
 interface ProductListGetter {
-  getProductList(): Promise<Product[]>
+  find(Query): Promise<Product[]>
 }
 
 export function getProductListHandler(repo: ProductListGetter): APIGatewayProxyHandler {
 
   return async () => {
     try {
-      const products = await repo.getProductList();
+      const products = await repo.find(Queries.getProductsWithImagesAndStock());
 
       return {
         headers: {

@@ -1,4 +1,4 @@
-import type { Serverless, } from 'serverless/aws';
+import type { Serverless } from 'serverless/aws';
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -23,7 +23,10 @@ const serverlessConfiguration: Serverless = {
   },
 
   // Add the serverless-webpack plugin
-  plugins: ['serverless-webpack',],
+  plugins: [
+    'serverless-webpack',
+    'serverless-dotenv-plugin',
+  ],
 
   provider: {
     name: 'aws',
