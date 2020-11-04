@@ -1,0 +1,7 @@
+GET {{url}}/products
+
+###
+GET {{url}}/products/a1c38af4-d208-4adb-943c-fbd9d9b4fdfe
+
+###
+GET {{url}}/products/not-existing-id

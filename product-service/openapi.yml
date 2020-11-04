@@ -1,0 +1,62 @@
+openapi: 3.0.0
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        images:
+          type: array
+          items:
+            type: string
+    GetProductListResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Product'
+info:
+  title: RS School App Products Service
+  version: '1'
+paths:
+  /products:
+    get:
+      tags:
+        - Product Service
+      operationId: getProductList
+      summary: Get Product List
+      description: The endpoint returns a list of products.
+      responses:
+        '200':
+          description: A list of products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProductListResponse'
+  '/products/{productId}':
+    get:
+      tags:
+        - Product Service
+      operationId: getProductById
+      parameters:
+        - in: path
+          name: productId
+          schema:
+            type: string
+          required: true
+          description: Product Id
+      summary: Get Product By Id
+      responses:
+        '200':
+          description: Product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product Not Found

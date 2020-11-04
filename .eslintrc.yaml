@@ -1,0 +1,12 @@
+root: true
+parser: '@typescript-eslint/parser'
+plugins:
+  - '@typescript-eslint'
+extends:
+  - 'eslint:recommended'
+  - 'plugin:@typescript-eslint/recommended'
+rules:
+  semi: [ error, always ]
+  comma-dangle: [ error, always ]
+  no-unused-vars: off
+  '@typescript-eslint/no-unused-vars': [ 'error' ]
