@@ -5,15 +5,17 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { StatusCodes } from 'http-status-codes';
 import JSONErrorHandlerMiddleware from "middy-middleware-json-error-handler";
 import 'source-map-support/register';
+import { ConsoleLogger, Logger } from "../infrastructure/logger";
 import { ProductRepository } from "../repository/product/product";
 import { Queries } from "../repository/product/product-query";
 import { Product } from "../repository/product/product.type";
+import { LoggerMiddleware } from "./middleware/logger-middleware";
 
 interface ProductListGetter {
   find(Query): Promise<Product[]>
 }
 
-export function getProductListHandler(repo: ProductListGetter): APIGatewayProxyHandler {
+export function getProductListHandler(repo: ProductListGetter, logger: Logger): APIGatewayProxyHandler {
 
   return middy(
     async () => {
@@ -21,18 +23,12 @@ export function getProductListHandler(repo: ProductListGetter): APIGatewayProxyH
         const products = await repo.find(Queries.getProductsWithImagesAndStock());
 
         return {
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-          },
           statusCode: StatusCodes.OK,
           body: JSON.stringify(products),
         };
       } catch (err) {
 
         return {
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-          },
           statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
           body: JSON.stringify({
             message: err.message,
@@ -40,8 +36,9 @@ export function getProductListHandler(repo: ProductListGetter): APIGatewayProxyH
         };
       }
     })
+    .use(LoggerMiddleware(logger))
     .use(cors())
     .use(JSONErrorHandlerMiddleware());
 }
 
-export const getProductList: APIGatewayProxyHandler = getProductListHandler(new ProductRepository());
+export const getProductList: APIGatewayProxyHandler = getProductListHandler(new ProductRepository(), new ConsoleLogger());

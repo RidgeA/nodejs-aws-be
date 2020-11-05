@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { StatusCodes } from 'http-status-codes';
+import { NoopLogger } from "../infrastructure/logger";
 import { name } from '../package.json';
 import { Product } from "../repository/product/product.type";
 import { getProductListHandler } from './get-product-list';
@@ -33,7 +34,7 @@ describe(name, () => {
         },
       };
 
-      const handler = getProductListHandler(repository);
+      const handler = getProductListHandler(repository, new NoopLogger());
 
       const actual = await handler({} as APIGatewayProxyEvent, null, null) as APIGatewayProxyResult;
 
@@ -50,7 +51,7 @@ describe(name, () => {
         },
       };
 
-      const handler = getProductListHandler(repository);
+      const handler = getProductListHandler(repository, new NoopLogger());
 
       const actual = await handler({} as APIGatewayProxyEvent, null, null) as APIGatewayProxyResult;
 

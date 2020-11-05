@@ -5,8 +5,10 @@ import { IsArray, IsInt, IsOptional, IsString, IsUrl, Min } from "class-validato
 import { StatusCodes } from "http-status-codes";
 import ClassValidatorMiddleware, { WithBody } from 'middy-middleware-class-validator';
 import JSONErrorHandlerMiddleware from 'middy-middleware-json-error-handler';
+import { ConsoleLogger, Logger } from "../infrastructure/logger";
 import { ProductRepository } from "../repository/product/product";
 import { Product } from "../repository/product/product.type";
+import { LoggerMiddleware } from "./middleware/logger-middleware";
 
 interface ProductSaver {
   save(Product): Promise<Product>
@@ -34,7 +36,7 @@ class CreateProductDTO {
   images: string[];
 }
 
-export function createProductHandler(repo: ProductSaver): APIGatewayProxyHandler {
+export function createProductHandler(repo: ProductSaver, logger: Logger): APIGatewayProxyHandler {
 
   return middy(
     async (event: WithBody<APIGatewayProxyEvent, CreateProductDTO>) => {
@@ -48,9 +50,10 @@ export function createProductHandler(repo: ProductSaver): APIGatewayProxyHandler
         body: JSON.stringify(product),
       };
     })
+    .use(LoggerMiddleware(logger))
     .use(cors())
     .use(ClassValidatorMiddleware({ classType: CreateProductDTO }))
     .use(JSONErrorHandlerMiddleware());
 }
 
-export const createProduct: APIGatewayProxyHandler = createProductHandler(new ProductRepository());
+export const createProduct: APIGatewayProxyHandler = createProductHandler(new ProductRepository(), new ConsoleLogger());

@@ -5,15 +5,17 @@ import { StatusCodes } from 'http-status-codes';
 import JSONErrorHandlerMiddleware from 'middy-middleware-json-error-handler';
 import { NotFoundError } from "slonik";
 import 'source-map-support/register';
+import { ConsoleLogger, Logger } from "../infrastructure/logger";
 import { ProductRepository } from "../repository/product/product";
 import { Queries } from "../repository/product/product-query";
 import { Product } from "../repository/product/product.type";
+import { LoggerMiddleware } from "./middleware/logger-middleware";
 
 interface ProductByIdGetter {
   findOne(Query): Promise<Product>
 }
 
-export function getProductByIdHandler(repo: ProductByIdGetter): APIGatewayProxyHandler {
+export function getProductByIdHandler(repo: ProductByIdGetter, logger: Logger): APIGatewayProxyHandler {
 
   return middy(
     async (event) => {
@@ -42,9 +44,10 @@ export function getProductByIdHandler(repo: ProductByIdGetter): APIGatewayProxyH
         };
       }
     })
+    .use(LoggerMiddleware(logger))
     .use(cors())
     .use(JSONErrorHandlerMiddleware());
 }
 
-export const getProductById: APIGatewayProxyHandler = getProductByIdHandler(new ProductRepository());
+export const getProductById: APIGatewayProxyHandler = getProductByIdHandler(new ProductRepository(), new ConsoleLogger());
 

@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { isUUID } from "class-validator";
 import { StatusCodes } from "http-status-codes";
+import { NoopLogger } from "../infrastructure/logger";
 
 import { name } from '../package.json';
 import { createProductHandler } from "./create-product";
@@ -21,7 +22,7 @@ describe(name, () => {
         save: jest.fn().mockResolvedValue(product),
       };
 
-      const handler = createProductHandler(repo);
+      const handler = createProductHandler(repo, new NoopLogger());
 
       const event = {
         body: product,
@@ -46,7 +47,7 @@ describe(name, () => {
         save: jest.fn().mockResolvedValue(product),
       };
 
-      const handler = createProductHandler(repo);
+      const handler = createProductHandler(repo, new NoopLogger());
 
       const event = {
         body: product,
@@ -81,7 +82,7 @@ describe(name, () => {
         save: jest.fn().mockRejectedValue(new Error('should not be called')),
       };
 
-      const handler = createProductHandler(repo);
+      const handler = createProductHandler(repo, new NoopLogger());
 
       const event = {
         body: product,
@@ -119,7 +120,7 @@ describe(name, () => {
         save: jest.fn().mockRejectedValue(new Error('should not be called')),
       };
 
-      const handler = createProductHandler(repo);
+      const handler = createProductHandler(repo, new NoopLogger());
 
       const event = {
         body: product,
@@ -150,7 +151,7 @@ describe(name, () => {
         save: jest.fn().mockRejectedValue(new Error('should not be called')),
       };
 
-      const handler = createProductHandler(repo);
+      const handler = createProductHandler(repo, new NoopLogger());
 
       const event = {
         body: product,

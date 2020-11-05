@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { StatusCodes } from 'http-status-codes';
 import { NotFoundError } from "slonik";
+import { NoopLogger } from "../infrastructure/logger";
 import { name } from '../package.json';
 import { getProductByIdHandler } from './get-product-by-id';
 
@@ -21,7 +22,7 @@ describe(name, () => {
         }),
       };
 
-      const handler = getProductByIdHandler(repository);
+      const handler = getProductByIdHandler(repository, new NoopLogger());
 
       const event = { pathParameters: { id } } as unknown as APIGatewayProxyEvent;
 
@@ -38,7 +39,7 @@ describe(name, () => {
         findOne: jest.fn().mockRejectedValue(new NotFoundError()),
       };
 
-      const handler = getProductByIdHandler(repository);
+      const handler = getProductByIdHandler(repository, new NoopLogger());
 
       const event = { pathParameters: { id } } as unknown as APIGatewayProxyEvent;
 
@@ -55,7 +56,7 @@ describe(name, () => {
         findOne: jest.fn().mockRejectedValue(new Error('some error')),
       };
 
-      const handler = getProductByIdHandler(repository);
+      const handler = getProductByIdHandler(repository, new NoopLogger());
 
       const event = { pathParameters: { id } } as unknown as APIGatewayProxyEvent;
 
