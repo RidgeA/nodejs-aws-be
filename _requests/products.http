@@ -3,5 +3,19 @@ GET {{url}}/products
 ###
 GET {{url}}/products/a1c38af4-d208-4adb-943c-fbd9d9b4fdfe
 
+### Non existing id
+GET {{url}}/products/00000000-0000-0000-0000-000000000000
+
 ###
-GET {{url}}/products/not-existing-id
+POST {{url}}/products
+Content-Type: application/json;
+
+{
+  "title": "title",
+  "description": "description",
+  "price": 1000,
+  "count": 0,
+  "images": [
+    "http://magazilla.ru/jpg_zoom1/700928.jpg"
+  ]
+}

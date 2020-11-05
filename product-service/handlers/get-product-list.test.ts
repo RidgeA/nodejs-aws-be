@@ -1,4 +1,4 @@
-import { APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { StatusCodes } from 'http-status-codes';
 import { name } from '../package.json';
 import { Product } from "../repository/product/product.type";
@@ -18,12 +18,14 @@ describe(name, () => {
               description: "Вес (г): 338; Размеры (мм): 141.9x73x21.8;",
               images: ["http://magazilla.ru/jpg_zoom1/700928.jpg"],
               price: 1815,
+              count: 10,
               id: "673e8fa0-b0c7-49b1-a74a-ca6b5330e642",
             },
             {
               title: "Powerbank аккумулятор Xiaomi Mi Power Bank 2 10000",
               description: "Вес (г): 217; Размеры (мм): 130x71x14;",
               images: ["http://magazilla.ru/jpg_zoom1/1088756.jpg"],
+              count: 10,
               price: 1045,
               id: "3a24dece-d71e-46e7-85b4-d0ca9e00c3e1",
             },
@@ -33,7 +35,7 @@ describe(name, () => {
 
       const handler = getProductListHandler(repository);
 
-      const actual = await handler(null, null, null) as APIGatewayProxyResult;
+      const actual = await handler({} as APIGatewayProxyEvent, null, null) as APIGatewayProxyResult;
 
       expect(actual).toHaveProperty('statusCode', StatusCodes.OK);
       expect(typeof actual.body).toBe('string');
@@ -50,7 +52,7 @@ describe(name, () => {
 
       const handler = getProductListHandler(repository);
 
-      const actual = await handler(null, null, null) as APIGatewayProxyResult;
+      const actual = await handler({} as APIGatewayProxyEvent, null, null) as APIGatewayProxyResult;
 
       expect(actual).toHaveProperty('statusCode', StatusCodes.INTERNAL_SERVER_ERROR);
       expect(typeof actual.body).toBe('string');

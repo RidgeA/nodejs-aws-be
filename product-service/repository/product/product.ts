@@ -1,3 +1,4 @@
+import { sql } from "slonik";
 import { pg } from '../../infrastructure/db';
 import { Query } from "../query.interface";
 import { Product } from './product.type';
@@ -14,5 +15,34 @@ export class ProductRepository {
     const rows = await pg.one(q());
 
     return rows as unknown as Product;
+  }
+
+  async save(product: Product): Promise<Product> {
+
+    const insertProduct = sql`
+    insert into "product" ("product_id", "title", "description", "price") 
+    values (${product.id}, ${product.title}, ${product.description}, ${product.price})
+    `;
+
+    const insertCount = sql`
+    insert into "stock" ("product_id", "count") values (${product.id}, ${product.count})
+    `;
+
+    const imgRecords = [];
+    for (const img of product.images) {
+      imgRecords.push(sql`(${product.id}, ${img})`);
+    }
+    const insertImages = sql`
+    insert into "product_image" ("product_id", "image_url") 
+    values ${sql.join(imgRecords, sql`, `)}
+    `;
+
+    await pg.transaction(async tx => {
+      await tx.query(insertProduct);
+      await tx.query(insertCount);
+      await tx.query(insertImages);
+    });
+
+    return product;
   }
 }

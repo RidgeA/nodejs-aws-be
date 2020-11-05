@@ -26,6 +26,7 @@ const serverlessConfiguration: Serverless = {
   plugins: [
     'serverless-webpack',
     'serverless-dotenv-plugin',
+    'serverless-offline',
   ],
 
   provider: {
@@ -60,6 +61,18 @@ const serverlessConfiguration: Serverless = {
           http: {
             method: 'get',
             path: 'products/{id}',
+            cors: true,
+          },
+        },
+      ],
+    },
+    createProduct: {
+      handler: 'handler.createProduct',
+      events: [
+        {
+          http: {
+            method: 'post',
+            path: 'products',
             cors: true,
           },
         },
