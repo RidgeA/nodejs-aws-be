@@ -3,16 +3,19 @@ import { pg } from '../../infrastructure/db';
 import { Query } from "../query.interface";
 import { Product } from './product.type';
 
+//TODO: Need a better way to close connection
 export class ProductRepository {
 
   async find(q: Query): Promise<Product[]> {
     const rows = await pg.many(q());
+    await pg.end();
 
     return rows as unknown as Product[];
   }
 
   async findOne(q: Query): Promise<Product> {
     const rows = await pg.one(q());
+    await pg.end();
 
     return rows as unknown as Product;
   }
@@ -42,6 +45,7 @@ export class ProductRepository {
       await tx.query(insertCount);
       await tx.query(insertImages);
     });
+    await pg.end();
 
     return product;
   }

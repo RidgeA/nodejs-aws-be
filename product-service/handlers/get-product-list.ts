@@ -1,6 +1,5 @@
 import middy from '@middy/core';
 import cors from "@middy/http-cors";
-
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { StatusCodes } from 'http-status-codes';
 import JSONErrorHandlerMiddleware from "middy-middleware-json-error-handler";
@@ -15,27 +14,26 @@ interface ProductListGetter {
   find(Query): Promise<Product[]>
 }
 
-export function getProductListHandler(repo: ProductListGetter, logger: Logger): APIGatewayProxyHandler {
+export function getProductListHandler(repo: ProductListGetter, logger?: Logger): APIGatewayProxyHandler {
 
-  return middy(
-    async () => {
-      try {
-        const products = await repo.find(Queries.getProductsWithImagesAndStock());
+  return middy(async () => {
+    try {
+      const products = await repo.find(Queries.getProductsWithImagesAndStock());
 
-        return {
-          statusCode: StatusCodes.OK,
-          body: JSON.stringify(products),
-        };
-      } catch (err) {
+      return {
+        statusCode: StatusCodes.OK,
+        body: JSON.stringify(products),
+      };
+    } catch (err) {
 
-        return {
-          statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-          body: JSON.stringify({
-            message: err.message,
-          }),
-        };
-      }
-    })
+      return {
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        body: JSON.stringify({
+          message: err.message,
+        }),
+      };
+    }
+  })
     .use(LoggerMiddleware(logger))
     .use(cors())
     .use(JSONErrorHandlerMiddleware());

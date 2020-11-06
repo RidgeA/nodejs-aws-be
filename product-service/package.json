@@ -24,7 +24,6 @@
     "@types/node": "^10.12.18",
     "@types/pg": "^7.14.5",
     "@types/serverless": "^1.72.5",
-    "copy-webpack-plugin": "^6.2.1",
     "fork-ts-checker-webpack-plugin": "^3.0.1",
     "serverless-dotenv-plugin": "^3.1.0",
     "serverless-offline": "^6.8.0",
