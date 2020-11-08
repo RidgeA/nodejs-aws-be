@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda";
 import { StatusCodes } from 'http-status-codes';
 import { NoopLogger } from "../infrastructure/logger";
 import { name } from '../package.json';
@@ -36,7 +36,9 @@ describe(name, () => {
 
       const handler = getProductListHandler(repository, new NoopLogger());
 
-      const actual = await handler({} as APIGatewayProxyEvent, null, null) as APIGatewayProxyResult;
+      const event = {} as APIGatewayProxyEvent;
+      const context = {} as Context;
+      const actual = await handler(event, context, null) as APIGatewayProxyResult;
 
       expect(actual).toHaveProperty('statusCode', StatusCodes.OK);
       expect(typeof actual.body).toBe('string');
@@ -53,7 +55,9 @@ describe(name, () => {
 
       const handler = getProductListHandler(repository, new NoopLogger());
 
-      const actual = await handler({} as APIGatewayProxyEvent, null, null) as APIGatewayProxyResult;
+      const event = {} as APIGatewayProxyEvent;
+      const context = {} as Context;
+      const actual = await handler(event, context, null) as APIGatewayProxyResult;
 
       expect(actual).toHaveProperty('statusCode', StatusCodes.INTERNAL_SERVER_ERROR);
       expect(typeof actual.body).toBe('string');

@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda";
 import { StatusCodes } from 'http-status-codes';
 import { NotFoundError } from "slonik";
 import { NoopLogger } from "../infrastructure/logger";
@@ -25,8 +25,9 @@ describe(name, () => {
       const handler = getProductByIdHandler(repository, new NoopLogger());
 
       const event = { pathParameters: { id } } as unknown as APIGatewayProxyEvent;
+      const context = {} as Context;
 
-      const actual = await handler(event, null, null) as APIGatewayProxyResult;
+      const actual = await handler(event, context, null) as APIGatewayProxyResult;
 
       expect(actual).toHaveProperty('statusCode', StatusCodes.OK);
       expect(typeof actual.body).toBe('string');
@@ -42,8 +43,8 @@ describe(name, () => {
       const handler = getProductByIdHandler(repository, new NoopLogger());
 
       const event = { pathParameters: { id } } as unknown as APIGatewayProxyEvent;
-
-      const actual = await handler(event, null, null) as APIGatewayProxyResult;
+      const context = {} as Context;
+      const actual = await handler(event, context, null) as APIGatewayProxyResult;
 
       expect(actual).toHaveProperty('statusCode', StatusCodes.NOT_FOUND);
       expect(actual.body).toBe('Product not found');
@@ -59,8 +60,8 @@ describe(name, () => {
       const handler = getProductByIdHandler(repository, new NoopLogger());
 
       const event = { pathParameters: { id } } as unknown as APIGatewayProxyEvent;
-
-      const actual = await handler(event, null, null) as APIGatewayProxyResult;
+      const context = {} as Context;
+      const actual = await handler(event, context, null) as APIGatewayProxyResult;
 
       expect(actual).toHaveProperty('statusCode', StatusCodes.INTERNAL_SERVER_ERROR);
       expect(typeof actual.body).toBe('string');

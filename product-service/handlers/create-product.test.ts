@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda";
 import { isUUID } from "class-validator";
 import { StatusCodes } from "http-status-codes";
 import { NoopLogger } from "../infrastructure/logger";
@@ -26,9 +26,10 @@ describe(name, () => {
 
       const event = {
         body: product,
+        context: {},
       } as unknown as APIGatewayProxyEvent;
-
-      await handler(event, null, null);
+      const context = {} as Context;
+      await handler(event, context, null);
 
       expect(repo.save.mock.calls.length).toBe(1);
 
@@ -52,12 +53,12 @@ describe(name, () => {
       const event = {
         body: product,
       } as unknown as APIGatewayProxyEvent;
-
-      const actual = await handler(event, null, null);
+      const context = {} as Context;
+      const actual = await handler(event, context, null) as APIGatewayProxyResult;
 
       expect(actual).toHaveProperty('body');
 
-      const actualBody = JSON.parse((actual as APIGatewayProxyResult).body);
+      const actualBody = JSON.parse(actual.body);
       expect(actualBody).toHaveProperty('id');
       expect(isUUID(actualBody.id, 4)).toBeTruthy();
       expect(actualBody).toHaveProperty('title', product.title);
@@ -87,8 +88,8 @@ describe(name, () => {
       const event = {
         body: product,
       } as unknown as APIGatewayProxyEvent;
-
-      const actual = await handler(event, null, null) as APIGatewayProxyResult;
+      const context = {} as Context;
+      const actual = await handler(event, context, null) as APIGatewayProxyResult;
 
       expect(actual).toHaveProperty('statusCode');
       expect(actual.statusCode).toBe(StatusCodes.BAD_REQUEST);
@@ -125,8 +126,9 @@ describe(name, () => {
       const event = {
         body: product,
       } as unknown as APIGatewayProxyEvent;
+      const context = {} as Context;
 
-      const actual = await handler(event, null, null) as APIGatewayProxyResult;
+      const actual = await handler(event, context, null) as APIGatewayProxyResult;
 
       expect(actual).toHaveProperty('statusCode');
       expect(actual.statusCode).toBe(StatusCodes.BAD_REQUEST);
@@ -156,8 +158,9 @@ describe(name, () => {
       const event = {
         body: product,
       } as unknown as APIGatewayProxyEvent;
+      const context = {} as Context;
 
-      const actual = await handler(event, null, null) as APIGatewayProxyResult;
+      const actual = await handler(event, context, null) as APIGatewayProxyResult;
 
       expect(actual).toHaveProperty('statusCode');
       expect(actual.statusCode).toBe(StatusCodes.BAD_REQUEST);

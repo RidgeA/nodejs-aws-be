@@ -1,4 +1,5 @@
 import middy from '@middy/core';
+import doNotWaitForEmptyEventLoop from "@middy/do-not-wait-for-empty-event-loop";
 import cors from '@middy/http-cors';
 import { APIGatewayProxyEvent, APIGatewayProxyHandler } from "aws-lambda";
 import { IsArray, IsInt, IsOptional, IsString, IsUrl, Min } from "class-validator";
@@ -50,6 +51,7 @@ export function createProductHandler(repo: ProductSaver, logger: Logger): APIGat
         body: JSON.stringify(product),
       };
     })
+    .use(doNotWaitForEmptyEventLoop())
     .use(LoggerMiddleware(logger))
     .use(cors())
     .use(ClassValidatorMiddleware({ classType: CreateProductDTO }))

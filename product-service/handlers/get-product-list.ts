@@ -1,4 +1,5 @@
 import middy from '@middy/core';
+import doNotWaitForEmptyEventLoop from "@middy/do-not-wait-for-empty-event-loop";
 import cors from "@middy/http-cors";
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { StatusCodes } from 'http-status-codes';
@@ -34,6 +35,7 @@ export function getProductListHandler(repo: ProductListGetter, logger?: Logger):
       };
     }
   })
+    .use(doNotWaitForEmptyEventLoop())
     .use(LoggerMiddleware(logger))
     .use(cors())
     .use(JSONErrorHandlerMiddleware());
