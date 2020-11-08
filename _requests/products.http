@@ -14,8 +14,5 @@ Content-Type: application/json;
   "title": "title",
   "description": "description",
   "price": 1000,
-  "count": 0,
-  "images": [
-    "http://magazilla.ru/jpg_zoom1/700928.jpg"
-  ]
+  "count": 0
 }

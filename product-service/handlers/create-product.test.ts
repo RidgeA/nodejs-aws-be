@@ -68,6 +68,35 @@ describe(name, () => {
       expect(actualBody).toHaveProperty('images', product.images);
     });
 
+
+    it('should create a product without images', async () => {
+      const product = {
+        title: 'Product title',
+        description: 'Product description',
+        count: 1,
+        price: 100,
+      };
+
+      const repo = {
+        save: jest.fn().mockResolvedValue(product),
+      };
+
+      const handler = createProductHandler(repo, new NoopLogger());
+
+      const event = {
+        body: product,
+      } as unknown as APIGatewayProxyEvent;
+      const context = {} as Context;
+      const actual = await handler(event, context, null) as APIGatewayProxyResult;
+
+      expect(actual).toHaveProperty('body');
+
+      const actualBody = JSON.parse(actual.body);
+      expect(actualBody).toHaveProperty('images');
+      expect(Array.isArray(actualBody.images)).toBeTruthy();
+      expect(actualBody.images.length).toBe(0);
+    });
+
     it.each(['title', 'count', 'price'])('should validate required fields (%s)', async (property) => {
       const product = {
         title: 'Product title',

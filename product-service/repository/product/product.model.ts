@@ -14,7 +14,7 @@ export class Product {
       this.title = data.title;
       this.description = data.description;
       this.price = data.price;
-      this.images = data.images;
+      this.images = data.images ?? [];
       this.count = data.count;
     }
   }
