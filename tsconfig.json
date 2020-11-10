@@ -12,7 +12,8 @@
     "target": "es2015",
     "outDir": "lib",
     "experimentalDecorators": true,
-    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true
   },
   "include": [
     "./**/*.ts"
