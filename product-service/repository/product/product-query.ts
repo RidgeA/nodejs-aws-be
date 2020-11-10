@@ -13,7 +13,7 @@ const stockTableFields = (tAlias) => sql.join([
 ], sql`, `);
 
 const imagesFieldsArray = (tAlias) => sql.join([
-  sql`array_agg(${sql.identifier([tAlias, 'image_url'])}) ${sql.identifier(['images'])}`,
+  sql`array_remove(array_agg(distinct ${sql.identifier([tAlias, 'image_url'])}), NULL) ${sql.identifier(['images'])}`,
 ], sql`, `);
 
 export const Queries = {
@@ -25,7 +25,7 @@ export const Queries = {
         ${imagesFieldsArray('pi')}
       from product p
                join stock s on p.product_id = s.product_id
-               join product_image pi on p.product_id = pi.product_id
+               left join product_image pi on p.product_id = pi.product_id
       group by p.product_id, s.product_id;`;
   },
 
@@ -37,7 +37,7 @@ export const Queries = {
         ${imagesFieldsArray('pi')}
       from product p
       join stock s on p.product_id = s.product_id
-      join product_image pi on p.product_id = pi.product_id
+      left join product_image pi on p.product_id = pi.product_id
       where p.product_id = ${id}
         group by p.product_id, s.product_id;`;
   },

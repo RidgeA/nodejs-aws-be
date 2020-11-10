@@ -8,10 +8,7 @@ const serverlessConfiguration: Serverless = {
     // org: your-org-name,
   },
   package: {
-    include: [
-      'repository/products-mock-data.json',
-      'tsconfig.json',
-    ],
+    include: [],
   },
   frameworkVersion: '2',
   custom: {
