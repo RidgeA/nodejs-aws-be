@@ -1,21 +1,40 @@
 openapi: 3.0.0
+servers:
+  - url: https://2to564lyf9.execute-api.eu-west-1.amazonaws.com/dev
 components:
   schemas:
-    Product:
+    BaseProduct:
       type: object
+      required:
+        - title
+        - price
+        - count
       properties:
-        id:
-          type: string
         title:
           type: string
         description:
           type: string
         price:
           type: number
+        count:
+          type: number
         images:
           type: array
           items:
             type: string
+            format: url
+    CreateProduct:
+      allOf:
+        - $ref: '#/components/schemas/BaseProduct'
+    Product:
+      allOf:
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+        - $ref: '#/components/schemas/BaseProduct'
     GetProductListResponse:
       type: array
       items:
@@ -38,6 +57,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetProductListResponse'
+    post:
+      tags:
+        - Product Service
+      operationId: createProduct
+      summary: Create a new product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProduct'
+      responses:
+        '200':
+          description: Newly created product with id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
   '/products/{productId}':
     get:
       tags:

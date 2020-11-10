@@ -1,39 +1,44 @@
-import { APIGatewayProxyHandler, } from 'aws-lambda';
+import middy from '@middy/core';
+import doNotWaitForEmptyEventLoop from "@middy/do-not-wait-for-empty-event-loop";
+import cors from "@middy/http-cors";
+import { APIGatewayProxyHandler } from 'aws-lambda';
+import { StatusCodes } from 'http-status-codes';
+import JSONErrorHandlerMiddleware from "middy-middleware-json-error-handler";
 import 'source-map-support/register';
-import { ProductRepository, } from "../repository/product";
-import { Product, } from "../repository/product.type";
-import { StatusCodes, } from 'http-status-codes';
+import { ConsoleLogger, Logger } from "../infrastructure/logger";
+import { ProductRepository } from "../repository/product/product";
+import { Queries } from "../repository/product/product-query";
+import { Product } from "../repository/product/product.model";
+import { LoggerMiddleware } from "./middleware/logger-middleware";
 
 interface ProductListGetter {
-  getProductList(): Promise<Product[]>
+  find(Query): Promise<Product[]>
 }
 
-export function getProductListHandler(repo: ProductListGetter): APIGatewayProxyHandler {
+export function getProductListHandler(repo: ProductListGetter, logger?: Logger): APIGatewayProxyHandler {
 
-  return async () => {
+  return middy(async () => {
     try {
-      const products = await repo.getProductList();
+      const products = await repo.find(Queries.getProductsWithImagesAndStock());
 
       return {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        },
         statusCode: StatusCodes.OK,
         body: JSON.stringify(products),
       };
     } catch (err) {
 
       return {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        },
         statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
         body: JSON.stringify({
           message: err.message,
         }),
       };
     }
-  };
+  })
+    .use(doNotWaitForEmptyEventLoop())
+    .use(LoggerMiddleware(logger))
+    .use(cors())
+    .use(JSONErrorHandlerMiddleware());
 }
 
-export const getProductList: APIGatewayProxyHandler = getProductListHandler(new ProductRepository());
+export const getProductList: APIGatewayProxyHandler = getProductListHandler(new ProductRepository(), new ConsoleLogger());

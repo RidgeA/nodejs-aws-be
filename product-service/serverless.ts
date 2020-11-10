@@ -1,4 +1,4 @@
-import type { Serverless, } from 'serverless/aws';
+import type { Serverless } from 'serverless/aws';
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -8,10 +8,7 @@ const serverlessConfiguration: Serverless = {
     // org: your-org-name,
   },
   package: {
-    include: [
-      'repository/products-mock-data.json',
-      'tsconfig.json',
-    ],
+    include: [],
   },
   frameworkVersion: '2',
   custom: {
@@ -23,7 +20,11 @@ const serverlessConfiguration: Serverless = {
   },
 
   // Add the serverless-webpack plugin
-  plugins: ['serverless-webpack',],
+  plugins: [
+    'serverless-webpack',
+    'serverless-dotenv-plugin',
+    'serverless-offline',
+  ],
 
   provider: {
     name: 'aws',
@@ -57,6 +58,18 @@ const serverlessConfiguration: Serverless = {
           http: {
             method: 'get',
             path: 'products/{id}',
+            cors: true,
+          },
+        },
+      ],
+    },
+    createProduct: {
+      handler: 'handler.createProduct',
+      events: [
+        {
+          http: {
+            method: 'post',
+            path: 'products',
             cors: true,
           },
         },
