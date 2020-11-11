@@ -4,9 +4,9 @@ import { APIGatewayProxyHandler } from "aws-lambda/trigger/api-gateway-proxy";
 import { StatusCodes } from "http-status-codes";
 import { container } from "tsyringe";
 import DependencyContainer from "tsyringe/dist/typings/types/dependency-container";
+import { buildResponse } from "../../shared/build-response";
 import { Token } from "../di";
 import { SignedUrlService } from "../services/signed-url/signed-url-service";
-import { buildResponse } from "../utils";
 
 export const importProductsFile: APIGatewayProxyHandler = importProductsFileHandler(container);
 

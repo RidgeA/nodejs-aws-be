@@ -6,6 +6,7 @@ import { IsArray, IsInt, IsOptional, IsString, IsUrl, Min } from "class-validato
 import { StatusCodes } from "http-status-codes";
 import ClassValidatorMiddleware, { WithBody } from 'middy-middleware-class-validator';
 import JSONErrorHandlerMiddleware from 'middy-middleware-json-error-handler';
+import { buildResponse } from "../../shared/build-response";
 import { ConsoleLogger, Logger } from "../infrastructure/logger";
 import { ProductRepository } from "../repository/product/product";
 import { Product } from "../repository/product/product.model";
@@ -46,10 +47,7 @@ export function createProductHandler(repo: ProductSaver, logger: Logger): APIGat
 
       await repo.save(product);
 
-      return {
-        statusCode: StatusCodes.CREATED,
-        body: JSON.stringify(product),
-      };
+      return buildResponse(StatusCodes.CREATED, product);
     })
     .use(doNotWaitForEmptyEventLoop())
     .use(LoggerMiddleware(logger))

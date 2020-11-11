@@ -4,7 +4,7 @@ const isString = (v: unknown): v is string => {
   return typeof v === 'string';
 };
 
-export const buildResponse = (statusCode: number, _body: Record<string, unknown> | string): APIGatewayProxyResult => {
+export const buildResponse = (statusCode: number, _body: unknown): APIGatewayProxyResult => {
 
   let body;
 
