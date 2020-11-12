@@ -1,4 +1,9 @@
+import * as dotenv from 'dotenv';
 import type { Serverless } from 'serverless/aws';
+
+dotenv.config();
+
+const uploadBucketName = process.env.BUCKET;
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -34,6 +39,26 @@ const serverlessConfiguration: Serverless = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
     },
+    iamRoleStatements: [
+      {
+        Effect: 'Allow',
+        Action: 's3:ListBucket',
+        Resource: [
+          `arn:aws:s3:::${uploadBucketName}`,
+        ],
+      },
+      {
+        Effect: 'Allow',
+        Action: [
+          's3:GetObject',
+          's3:PutObject',
+          's3:DeleteObject',
+        ],
+        Resource: [
+          `arn:aws:s3:::${uploadBucketName}/*`,
+        ],
+      },
+    ],
   },
   functions: {
     importProductsFile: {
@@ -51,6 +76,19 @@ const serverlessConfiguration: Serverless = {
                 },
               },
             },
+          },
+        },
+      ],
+    },
+    importFileParser: {
+      handler: 'handler.importFileParser',
+      events: [
+        {
+          s3: {
+            bucket: uploadBucketName,
+            event: 's3:ObjectCreated:*',
+            existing: true,
+            rules: [{ prefix: 'upload/', suffix: '.csv' }],
           },
         },
       ],

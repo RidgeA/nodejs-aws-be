@@ -14,11 +14,24 @@ describe(name, () => {
 
     it('should return HTTP status 400 (Bad Request) if name query parameter missed', async () => {
 
-      container.register(Token.SignedUrlService, {
-        useValue: {
-          getSignedUrl: jest.fn(),
-        },
-      });
+      const fileName = 'file-name';
+      const bucket = 'bucket';
+      const url = `https://signed.url/upload/${fileName}`;
+
+      const configEnv = jest.fn().mockReturnValue({ bucket: bucket });
+      const signedUrlPromise = jest.fn().mockResolvedValue(url);
+
+      container
+        .register(Token.Config, {
+          useValue: {
+            env: configEnv,
+          },
+        })
+        .register(Token.S3, {
+          useValue: {
+            getSignedUrlPromise: signedUrlPromise,
+          },
+        });
 
       const handler = importProductsFileHandler(container);
 
@@ -31,12 +44,23 @@ describe(name, () => {
 
     it('should call return url with file name', async () => {
 
-      const url = 'https://signed.url';
-      container.register(Token.SignedUrlService, {
-        useValue: {
-          getSignedUrl: jest.fn().mockResolvedValue(url),
-        },
-      });
+      const fileName = 'file-name';
+      const bucket = 'bucket';
+      const url = `https://signed.url/upload/${fileName}`;
+
+      const configEnv = jest.fn().mockReturnValue({ bucket: bucket });
+      const signedUrlPromise = jest.fn().mockResolvedValue(url);
+      container
+        .register(Token.Config, {
+          useValue: {
+            env: configEnv,
+          },
+        })
+        .register(Token.S3, {
+          useValue: {
+            getSignedUrlPromise: signedUrlPromise,
+          },
+        });
 
       const handler = importProductsFileHandler(container);
 
@@ -48,31 +72,6 @@ describe(name, () => {
       expect(result).toHaveProperty('statusCode', StatusCodes.OK);
       expect(result).toHaveProperty('body', url);
     });
-
-    it('should pass file name to the SignedUrlService service', async () => {
-
-      const getSignedUrl = jest.fn().mockResolvedValue('https://signed.url');
-
-      container.register(Token.SignedUrlService, {
-        useValue: {
-          getSignedUrl,
-        },
-      });
-
-      const handler = importProductsFileHandler(container);
-
-      const name = 'name';
-      const event = { queryStringParameters: { name } } as unknown as APIGatewayProxyEvent;
-
-      const context = {} as Context;
-      await handler(event, context, null);
-
-      const [firstCall] = getSignedUrl.mock.calls;
-      const [firstArg] = firstCall;
-      expect(firstArg).toBe(name);
-
-    });
-
 
   });
 });

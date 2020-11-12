@@ -8,9 +8,9 @@ import { NotFoundError } from "slonik";
 import 'source-map-support/register';
 import { buildResponse } from "../../shared/build-response";
 import { ConsoleLogger, Logger } from "../infrastructure/logger";
-import { ProductRepository } from "../repository/product/product";
-import { Queries } from "../repository/product/product-query";
-import { Product } from "../repository/product/product.model";
+import { ProductRepository } from "../../repository/product/product";
+import { Queries } from "../../repository/product/product-query";
+import { Product } from "../../repository/product/product.model";
 import { LoggerMiddleware } from "./middleware/logger-middleware";
 
 interface ProductByIdGetter {

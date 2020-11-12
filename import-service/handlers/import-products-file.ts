@@ -1,12 +1,13 @@
 import middy from "@middy/core";
 import cors from "@middy/http-cors";
 import { APIGatewayProxyHandler } from "aws-lambda/trigger/api-gateway-proxy";
+import { S3 } from "aws-sdk";
 import { StatusCodes } from "http-status-codes";
 import { container } from "tsyringe";
 import DependencyContainer from "tsyringe/dist/typings/types/dependency-container";
 import { buildResponse } from "../../shared/build-response";
 import { Token } from "../di";
-import { SignedUrlService } from "../services/signed-url/signed-url-service";
+import { ConfigService } from "../services/config/config.service";
 
 export const importProductsFile: APIGatewayProxyHandler = importProductsFileHandler(container);
 
@@ -19,9 +20,13 @@ export function importProductsFileHandler(c: DependencyContainer): APIGatewayPro
       return buildResponse(StatusCodes.BAD_REQUEST, 'name');
     }
 
-    const service = c.resolve<SignedUrlService>(Token.SignedUrlService);
-    const uploadUrl = await service.getSignedUrl(name);
+    const s3 = c.resolve<S3>(Token.S3);
+    const config = c.resolve<ConfigService>(Token.Config);
 
-    return buildResponse(StatusCodes.OK, uploadUrl);
+    const bucketName = config.env().bucket;
+    const params = { Bucket: bucketName, Key: `upload/${name}` };
+    const url = await s3.getSignedUrlPromise('putObject', params);
+
+    return buildResponse(StatusCodes.OK, url);
   }).use(cors());
 }
