@@ -37,7 +37,7 @@ export function importFileParserHandler(c: DependencyContainer): S3Handler {
                 description: record.description as string,
                 price: Number(record.price),
                 count: Number(record.count),
-                images: (record.images as string).split(';'),
+                images: (record.images as string)?.split(';'),
               });
               console.log(product);
               callback();
