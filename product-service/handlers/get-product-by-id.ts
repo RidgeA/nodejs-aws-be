@@ -5,19 +5,22 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { StatusCodes } from 'http-status-codes';
 import JSONErrorHandlerMiddleware from 'middy-middleware-json-error-handler';
 import { NotFoundError } from "slonik";
-import 'source-map-support/register';
+import { DependencyContainer } from "tsyringe";
+import { Product } from "../../models/product.model";
 import { buildResponse } from "../../shared/build-response";
-import { ConsoleLogger, Logger } from "../infrastructure/logger";
-import { ProductRepository } from "../../repository/product/product";
-import { Queries } from "../../repository/product/product-query";
-import { Product } from "../../repository/product/product.model";
+import { Token } from "../di";
+import { Logger } from "../infrastructure/logger";
+import { Queries } from "../repository/product/product-query";
 import { LoggerMiddleware } from "./middleware/logger-middleware";
 
 interface ProductByIdGetter {
   findOne(Query): Promise<Product>
 }
 
-export function getProductByIdHandler(repo: ProductByIdGetter, logger: Logger): APIGatewayProxyHandler {
+export function getProductByIdHandler(c: DependencyContainer): APIGatewayProxyHandler {
+
+  const logger = c.resolve<Logger>(Token.Logger);
+  const repo = c.resolve<ProductByIdGetter>(Token.ProductRepository);
 
   return middy(
     async (event) => {
@@ -42,6 +45,3 @@ export function getProductByIdHandler(repo: ProductByIdGetter, logger: Logger): 
     .use(cors())
     .use(JSONErrorHandlerMiddleware());
 }
-
-export const getProductById: APIGatewayProxyHandler = getProductByIdHandler(new ProductRepository(), new ConsoleLogger());
-

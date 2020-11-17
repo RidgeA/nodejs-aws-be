@@ -1,6 +1,9 @@
-// for https://github.com/dbartholomae/middy-middleware-class-validator
-import 'reflect-metadata';
+import { container } from "tsyringe";
 
-export { getProductList } from './get-product-list';
-export { getProductById } from './get-product-by-id';
-export { createProduct } from './create-product';
+import { createProductHandler } from './create-product';
+import { getProductByIdHandler } from "./get-product-by-id";
+import { getProductListHandler } from './get-product-list';
+
+export const getProductList = getProductListHandler(container);
+export const getProductById = getProductByIdHandler(container);
+export const createProduct = createProductHandler(container);

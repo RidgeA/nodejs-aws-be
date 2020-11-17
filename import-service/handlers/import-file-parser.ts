@@ -5,7 +5,7 @@ import parse from "csv-parser";
 import { pipeline, Writable } from "stream";
 import { container, DependencyContainer } from "tsyringe";
 import { promisify } from "util";
-import { Product } from "../../repository/product/product.model";
+import { Product } from "../../models/product.model";
 import { Token } from "../di";
 
 const pipelineP = promisify(pipeline);

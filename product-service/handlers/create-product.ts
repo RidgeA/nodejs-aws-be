@@ -6,10 +6,11 @@ import { IsArray, IsInt, IsOptional, IsString, IsUrl, Min } from "class-validato
 import { StatusCodes } from "http-status-codes";
 import ClassValidatorMiddleware, { WithBody } from 'middy-middleware-class-validator';
 import JSONErrorHandlerMiddleware from 'middy-middleware-json-error-handler';
+import { DependencyContainer } from "tsyringe";
+import { Product } from "../../models/product.model";
 import { buildResponse } from "../../shared/build-response";
-import { ConsoleLogger, Logger } from "../infrastructure/logger";
-import { ProductRepository } from "../../repository/product/product";
-import { Product } from "../../repository/product/product.model";
+import { Token } from "../di";
+import { Logger } from "../infrastructure/logger";
 import { LoggerMiddleware } from "./middleware/logger-middleware";
 
 interface ProductSaver {
@@ -38,7 +39,10 @@ class CreateProductDTO {
   images: string[];
 }
 
-export function createProductHandler(repo: ProductSaver, logger: Logger): APIGatewayProxyHandler {
+export function createProductHandler(c: DependencyContainer): APIGatewayProxyHandler {
+
+  const logger = c.resolve<Logger>(Token.Logger);
+  const repo = c.resolve<ProductSaver>(Token.ProductRepository);
 
   return middy(
     async (event: WithBody<APIGatewayProxyEvent, CreateProductDTO>) => {
@@ -55,5 +59,3 @@ export function createProductHandler(repo: ProductSaver, logger: Logger): APIGat
     .use(ClassValidatorMiddleware({ classType: CreateProductDTO }))
     .use(JSONErrorHandlerMiddleware());
 }
-
-export const createProduct: APIGatewayProxyHandler = createProductHandler(new ProductRepository(), new ConsoleLogger());

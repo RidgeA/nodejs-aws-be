@@ -1,18 +1,24 @@
-import { sql } from "slonik";
-import { pg } from 'product-servcie/infrastructure/db';
+import { DatabasePoolType, sql } from "slonik";
+import { inject, injectable } from "tsyringe";
+import { Product } from '../../../models/product.model';
+import { Token } from "../../di";
 import { Query } from "../query.interface";
-import { Product } from './product.model';
 
-//TODO: Need a better way to close connection
+@injectable()
 export class ProductRepository {
 
+  constructor(
+    @inject(Token.DBDriver) private readonly db: DatabasePoolType
+  ) {
+  }
+
   async find(q: Query): Promise<Product[]> {
-    const rows = await pg.many(q());
+    const rows = await this.db.many(q());
     return rows as unknown as Product[];
   }
 
   async findOne(q: Query): Promise<Product> {
-    const rows = await pg.one(q());
+    const rows = await this.db.one(q());
     return rows as unknown as Product;
   }
 
@@ -43,7 +49,7 @@ export class ProductRepository {
       );
     }
 
-    await pg.transaction(async tx => {
+    await this.db.transaction(async tx => {
       for (const query of queries) {
         await tx.query(query);
       }
