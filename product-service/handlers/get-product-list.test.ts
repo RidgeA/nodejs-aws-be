@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda
 import { StatusCodes } from 'http-status-codes';
 import { NoopLogger } from "../infrastructure/logger";
 import { name } from '../package.json';
-import { Product } from "../repository/product/product.model";
+import { Product } from "../../repository/product/product.model";
 import { getProductListHandler } from './get-product-list';
 
 describe(name, () => {

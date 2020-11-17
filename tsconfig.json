@@ -5,14 +5,15 @@
     ],
     "removeComments": true,
     "moduleResolution": "node",
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "resolveJsonModule": true,
     "sourceMap": true,
     "target": "es2015",
     "outDir": "lib",
     "experimentalDecorators": true,
-    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true
   },
   "include": [
     "./**/*.ts"

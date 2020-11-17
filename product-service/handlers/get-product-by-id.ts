@@ -6,10 +6,11 @@ import { StatusCodes } from 'http-status-codes';
 import JSONErrorHandlerMiddleware from 'middy-middleware-json-error-handler';
 import { NotFoundError } from "slonik";
 import 'source-map-support/register';
+import { buildResponse } from "../../shared/build-response";
 import { ConsoleLogger, Logger } from "../infrastructure/logger";
-import { ProductRepository } from "../repository/product/product";
-import { Queries } from "../repository/product/product-query";
-import { Product } from "../repository/product/product.model";
+import { ProductRepository } from "../../repository/product/product";
+import { Queries } from "../../repository/product/product-query";
+import { Product } from "../../repository/product/product.model";
 import { LoggerMiddleware } from "./middleware/logger-middleware";
 
 interface ProductByIdGetter {
@@ -25,24 +26,15 @@ export function getProductByIdHandler(repo: ProductByIdGetter, logger: Logger): 
 
         const product = await repo.findOne(Queries.getProductById(id));
 
-        return {
-          statusCode: StatusCodes.OK,
-          body: JSON.stringify(product),
-        };
+        return buildResponse(StatusCodes.OK, product);
       } catch (err) {
 
         if (err instanceof NotFoundError) {
 
-          return {
-            statusCode: StatusCodes.NOT_FOUND,
-            body: 'Product not found',
-          };
+          return buildResponse(StatusCodes.NOT_FOUND, 'Product not found');
         }
 
-        return {
-          statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-          body: JSON.stringify({ message: err.message }),
-        };
+        throw err;
       }
     })
     .use(doNotWaitForEmptyEventLoop())

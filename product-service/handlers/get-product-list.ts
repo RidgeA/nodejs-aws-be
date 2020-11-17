@@ -5,10 +5,11 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { StatusCodes } from 'http-status-codes';
 import JSONErrorHandlerMiddleware from "middy-middleware-json-error-handler";
 import 'source-map-support/register';
+import { buildResponse } from "../../shared/build-response";
 import { ConsoleLogger, Logger } from "../infrastructure/logger";
-import { ProductRepository } from "../repository/product/product";
-import { Queries } from "../repository/product/product-query";
-import { Product } from "../repository/product/product.model";
+import { ProductRepository } from "../../repository/product/product";
+import { Queries } from "../../repository/product/product-query";
+import { Product } from "../../repository/product/product.model";
 import { LoggerMiddleware } from "./middleware/logger-middleware";
 
 interface ProductListGetter {
@@ -18,22 +19,9 @@ interface ProductListGetter {
 export function getProductListHandler(repo: ProductListGetter, logger?: Logger): APIGatewayProxyHandler {
 
   return middy(async () => {
-    try {
-      const products = await repo.find(Queries.getProductsWithImagesAndStock());
+    const products = await repo.find(Queries.getProductsWithImagesAndStock());
 
-      return {
-        statusCode: StatusCodes.OK,
-        body: JSON.stringify(products),
-      };
-    } catch (err) {
-
-      return {
-        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        body: JSON.stringify({
-          message: err.message,
-        }),
-      };
-    }
+    return buildResponse(StatusCodes.OK, products);
   })
     .use(doNotWaitForEmptyEventLoop())
     .use(LoggerMiddleware(logger))

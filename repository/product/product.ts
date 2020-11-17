@@ -1,5 +1,5 @@
 import { sql } from "slonik";
-import { pg } from '../../infrastructure/db';
+import { pg } from 'product-servcie/infrastructure/db';
 import { Query } from "../query.interface";
 import { Product } from './product.model';
 
