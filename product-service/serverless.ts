@@ -38,6 +38,7 @@ const serverlessConfiguration: Serverless = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
     },
   },
+
   functions: {
     getProductList: {
       handler: 'handler.getProductList',
@@ -74,6 +75,17 @@ const serverlessConfiguration: Serverless = {
           },
         },
       ],
+    },
+  },
+
+  resources: {
+    Resources: {
+      'catalogItemsQueue': {
+        Type: 'AWS::SQS::Queue',
+        Properties: {
+          QueueName: 'catalogItemsQueue',
+        },
+      },
     },
   },
 };
