@@ -3,6 +3,7 @@ import { DependencyContainer } from "tsyringe";
 import { Product } from "../../models/product.model";
 import { Token } from "../di";
 import { Logger } from "../infrastructure/logger";
+import { NewProductNotificationService } from "../infrastructure/new-product-notification-service";
 
 interface ProductBatchSaver {
   save(products: Product[]): Promise<Product[]>
@@ -11,6 +12,7 @@ interface ProductBatchSaver {
 export function catalogBatchProcessHandler(c: DependencyContainer): SQSHandler {
 
   const repository = c.resolve<ProductBatchSaver>(Token.ProductRepository);
+  const notification = c.resolve<NewProductNotificationService>(Token.NewProductNotificationService);
   const logger = c.resolve<Logger>(Token.Logger);
 
   return async (event: SQSEvent) => {
@@ -34,5 +36,7 @@ export function catalogBatchProcessHandler(c: DependencyContainer): SQSHandler {
 
     logger.log(`Saving ${products.length} new products...`);
     await repository.save(products);
+
+    await notification.send(JSON.stringify(products, null, 2));
   };
 }

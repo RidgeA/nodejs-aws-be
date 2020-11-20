@@ -15,9 +15,14 @@ describe('catalogBatchProcess', () => {
 
   it('should call repository to save products', async () => {
     const save = jest.fn().mockResolvedValue(null);
-    testContainer.register(Token.ProductRepository, {
-      useValue: { save },
-    });
+    const send = jest.fn().mockResolvedValue(null);
+    testContainer
+      .register(Token.ProductRepository, {
+        useValue: { save },
+      })
+      .register(Token.NewProductNotificationService, {
+        useValue: { send },
+      });
 
     const product = {
       title: 'test product',
@@ -49,9 +54,14 @@ describe('catalogBatchProcess', () => {
 
   it('should skip malformed json string', async () => {
     const save = jest.fn().mockResolvedValue(null);
-    testContainer.register(Token.ProductRepository, {
-      useValue: { save },
-    });
+    const send = jest.fn().mockResolvedValue(null);
+    testContainer
+      .register(Token.ProductRepository, {
+        useValue: { save },
+      })
+      .register(Token.NewProductNotificationService, {
+        useValue: { send },
+      });
 
     const product = {
       title: 'test product',
@@ -87,9 +97,14 @@ describe('catalogBatchProcess', () => {
 
   it('should not call "save" method if there are not products to save', async () => {
     const save = jest.fn().mockResolvedValue(null);
-    testContainer.register(Token.ProductRepository, {
-      useValue: { save },
-    });
+    const send = jest.fn().mockResolvedValue(null);
+    testContainer
+      .register(Token.ProductRepository, {
+        useValue: { save },
+      })
+      .register(Token.NewProductNotificationService, {
+        useValue: { send },
+      });
 
     const event = {
       Records: [
@@ -103,5 +118,39 @@ describe('catalogBatchProcess', () => {
     await handler(event, null, null);
 
     expect(save).not.toHaveBeenCalled();
+  });
+
+  it('should send notification after saving products', async () => {
+    const save = jest.fn().mockResolvedValue(null);
+    const send = jest.fn().mockResolvedValue(null);
+    testContainer
+      .register(Token.ProductRepository, {
+        useValue: { save },
+      })
+      .register(Token.NewProductNotificationService, {
+        useValue: { send },
+      });
+
+    const product = {
+      title: 'test product',
+      description: 'test description',
+      price: 1,
+      count: 1,
+      images: [],
+    };
+    const event = {
+      Records: [
+        {
+          body: JSON.stringify(product),
+        },
+      ],
+    } as SQSEvent;
+    const handler = catalogBatchProcessHandler(testContainer);
+
+    await handler(event, null, null);
+
+    // todo assert invocation order
+    expect(save).toHaveBeenCalled();
+    expect(send).toHaveBeenCalled();
   });
 });

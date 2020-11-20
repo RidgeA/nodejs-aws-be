@@ -4,13 +4,14 @@ import type { Serverless } from 'serverless/aws';
 dotenv.config();
 
 const catalogItemsQueue = process.env.SQS_QUEUE_CATALOG_ITEMS_QUEUE;
+const createProductTopic = process.env.SNS_TOPIC_CREATE_PRODUCT_TOPIC;
+const newProductEmail = process.env.SNS_NEW_PRODUCT_SUBSCRIPTION_EMAIL;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const newProductZeroCountEmail = process.env.SNS_NEW_PRODUCT_ZERO_COUNT_SUBSCRIPTION_EMAIL;
 
 const serverlessConfiguration: Serverless = {
   service: {
     name: 'product-service',
-    // app and org for use with dashboard.serverless.com
-    // app: your-app-name,
-    // org: your-org-name,
   },
   package: {
     include: [],
@@ -42,6 +43,17 @@ const serverlessConfiguration: Serverless = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
     },
+    iamRoleStatements: [
+      {
+        Effect: 'Allow',
+        Action: [
+          'sns:Publish',
+        ],
+        Resource: {
+          Ref: createProductTopic,
+        },
+      },
+    ],
   },
 
   functions: {
@@ -102,6 +114,22 @@ const serverlessConfiguration: Serverless = {
         Type: 'AWS::SQS::Queue',
         Properties: {
           QueueName: catalogItemsQueue,
+        },
+      },
+      [createProductTopic]: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+          TopicName: createProductTopic,
+        },
+      },
+      [`${createProductTopic}Sub`]: {
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Endpoint: newProductEmail,
+          Protocol: 'email',
+          TopicArn: {
+            Ref: createProductTopic,
+          },
         },
       },
     },
