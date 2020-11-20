@@ -14,7 +14,7 @@ import { Logger } from "../infrastructure/logger";
 import { LoggerMiddleware } from "./middleware/logger-middleware";
 
 interface ProductSaver {
-  save(Product): Promise<Product>
+  save(Product): Promise<void>
 }
 
 class CreateProductDTO {

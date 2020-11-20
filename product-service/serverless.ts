@@ -1,4 +1,9 @@
+import dotenv from 'dotenv';
 import type { Serverless } from 'serverless/aws';
+
+dotenv.config();
+
+const catalogItemsQueue = process.env.SQS_QUEUE_CATALOG_ITEMS_QUEUE;
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -76,14 +81,47 @@ const serverlessConfiguration: Serverless = {
         },
       ],
     },
+    catalogBatchProcess: {
+      handler: 'handler.catalogBatchProcess',
+      events: [
+        {
+          sqs: {
+            batchSize: 5,
+            arn: {
+              'Fn::GetAtt': [catalogItemsQueue, 'Arn'],
+            },
+          },
+        },
+      ],
+    },
   },
 
   resources: {
     Resources: {
-      'catalogItemsQueue': {
+      [catalogItemsQueue]: {
         Type: 'AWS::SQS::Queue',
         Properties: {
-          QueueName: 'catalogItemsQueue',
+          QueueName: catalogItemsQueue,
+        },
+      },
+    },
+    Outputs: {
+      [`${catalogItemsQueue}Ref`]: {
+        Description: "SQS Topic URL to publish exported products",
+        Value: {
+          'Ref': catalogItemsQueue,
+        },
+        Export: {
+          Name: '${self:service.name}-catalog-items-queue-ref',
+        },
+      },
+      [`${catalogItemsQueue}Arn`]: {
+        Description: "SQS Topic ARN to publish exported products",
+        Value: {
+          'Fn::GetAtt': [catalogItemsQueue, 'Arn'],
+        },
+        Export: {
+          Name: '${self:service.name}-catalog-items-queue-arn',
         },
       },
     },
