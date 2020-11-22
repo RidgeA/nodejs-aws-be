@@ -16,7 +16,9 @@ const serverlessConfiguration: Serverless = {
   custom: {
     webpack: {
       webpackConfig: './webpack.config.js',
-      includeModules: true,
+      includeModules: {
+        forceExclude: 'aws-sdk',
+      },
       // keepOutputDirectory: true,
     },
   },
@@ -38,7 +40,9 @@ const serverlessConfiguration: Serverless = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-      SQS_QUEUE_CATALOG_ITEMS_QUEUE_REF: '!ImportValue product-service-catalog-items-queue-ref',
+      SQS_QUEUE_CATALOG_ITEMS_QUEUE_REF: {
+        'Fn::ImportValue': 'product-service-catalog-items-queue-ref',
+      },
     },
     iamRoleStatements: [
       {

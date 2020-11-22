@@ -5,9 +5,8 @@ dotenv.config();
 
 const catalogItemsQueue = process.env.SQS_QUEUE_CATALOG_ITEMS_QUEUE;
 const createProductTopic = process.env.SNS_TOPIC_CREATE_PRODUCT_TOPIC;
-const newProductEmail = process.env.SNS_NEW_PRODUCT_SUBSCRIPTION_EMAIL;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const newProductZeroCountEmail = process.env.SNS_NEW_PRODUCT_ZERO_COUNT_SUBSCRIPTION_EMAIL;
+const newProductEmail = process.env.SNS_NEW_PRODUCT_SUBSCRIPTION_SUCCESS;
+const newProductErrorEmail = process.env.SNS_NEW_PRODUCT_SUBSCRIPTION_FAIL;
 
 const serverlessConfiguration: Serverless = {
   service: {
@@ -20,7 +19,9 @@ const serverlessConfiguration: Serverless = {
   custom: {
     webpack: {
       webpackConfig: './webpack.config.js',
-      includeModules: true,
+      includeModules: {
+        forceExclude: 'aws-sdk',
+      },
       // keepOutputDirectory: true,
     },
   },
@@ -42,6 +43,9 @@ const serverlessConfiguration: Serverless = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      SNS_TOPIC_CREATE_PRODUCT_TOPIC_ARN: {
+        'Ref': createProductTopic,
+      },
     },
     iamRoleStatements: [
       {
@@ -122,13 +126,29 @@ const serverlessConfiguration: Serverless = {
           TopicName: createProductTopic,
         },
       },
-      [`${createProductTopic}Sub`]: {
+      [`${createProductTopic}SuccessSub`]: {
         Type: 'AWS::SNS::Subscription',
         Properties: {
           Endpoint: newProductEmail,
           Protocol: 'email',
           TopicArn: {
             Ref: createProductTopic,
+          },
+          FilterPolicy: {
+            result: ['success'],
+          },
+        },
+      },
+      [`${createProductTopic}FailSub`]: {
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Endpoint: newProductErrorEmail,
+          Protocol: 'email',
+          TopicArn: {
+            Ref: createProductTopic,
+          },
+          FilterPolicy: {
+            result: ['fail'],
           },
         },
       },

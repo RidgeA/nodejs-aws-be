@@ -22,7 +22,6 @@ export class ObjectStorage {
       Bucket: destinationBucket,
       CopySource: `/${sourceBucket}/${sourceKey}`,
       Key: destinationKey,
-      // key.replace('upload/', 'parsed/'),
     }).promise();
 
     await this.s3.deleteObject({

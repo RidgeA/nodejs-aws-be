@@ -2,7 +2,6 @@ import middy from '@middy/core';
 import doNotWaitForEmptyEventLoop from "@middy/do-not-wait-for-empty-event-loop";
 import cors from '@middy/http-cors';
 import { APIGatewayProxyEvent, APIGatewayProxyHandler } from "aws-lambda";
-import { IsArray, IsInt, IsOptional, IsString, IsUrl, Min } from "class-validator";
 import { StatusCodes } from "http-status-codes";
 import ClassValidatorMiddleware, { WithBody } from 'middy-middleware-class-validator';
 import JSONErrorHandlerMiddleware from 'middy-middleware-json-error-handler';
@@ -11,32 +10,11 @@ import { Product } from "../../models/product.model";
 import { buildResponse } from "../../shared/build-response";
 import { Token } from "../di";
 import { Logger } from "../infrastructure/logger";
+import { CreateProductDto } from "../dto/create-product-dto";
 import { LoggerMiddleware } from "./middleware/logger-middleware";
 
 interface ProductSaver {
   save(Product): Promise<void>
-}
-
-class CreateProductDTO {
-  @IsString()
-  title: string;
-
-  @IsString()
-  @IsOptional()
-  description: string;
-
-  @IsInt()
-  @Min(1)
-  price: number;
-
-  @IsInt()
-  @Min(0)
-  count: number;
-
-  @IsArray()
-  @IsOptional()
-  @IsUrl({}, { each: true })
-  images: string[];
 }
 
 export function createProductHandler(c: DependencyContainer): APIGatewayProxyHandler {
@@ -45,7 +23,7 @@ export function createProductHandler(c: DependencyContainer): APIGatewayProxyHan
   const repo = c.resolve<ProductSaver>(Token.ProductRepository);
 
   return middy(
-    async (event: WithBody<APIGatewayProxyEvent, CreateProductDTO>) => {
+    async (event: WithBody<APIGatewayProxyEvent, CreateProductDto>) => {
 
       const product = new Product(event.body);
 
@@ -56,6 +34,6 @@ export function createProductHandler(c: DependencyContainer): APIGatewayProxyHan
     .use(doNotWaitForEmptyEventLoop())
     .use(LoggerMiddleware(logger))
     .use(cors())
-    .use(ClassValidatorMiddleware({ classType: CreateProductDTO }))
+    .use(ClassValidatorMiddleware({ classType: CreateProductDto }))
     .use(JSONErrorHandlerMiddleware());
 }
