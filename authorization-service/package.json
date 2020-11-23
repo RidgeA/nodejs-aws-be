@@ -1,0 +1,30 @@
+{
+  "name": "authorization-servcie",
+  "version": "1.0.0",
+  "description": "RS School NodeJS AWS authorization service",
+  "main": "handler.js",
+  "scripts": {
+    "offline": "sls offline",
+    "deploy": "sls deploy"
+  },
+  "dependencies": {
+    "http-status-codes": "^2.1.4",
+    "reflect-metadata": "^0.1.13",
+    "source-map-support": "^0.5.10",
+    "tsyringe": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.19.4",
+    "@types/serverless": "^1.72.5",
+    "serverless-dotenv-plugin": "^3.1.0",
+    "serverless-offline": "^6.8.0",
+    "serverless-webpack": "^5.3.5",
+    "ts-loader": "^5.3.3",
+    "ts-node": "^8.10.2",
+    "typescript": "3.8",
+    "webpack": "^4.29.0",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "author": "The serverless webpack authors (https://github.com/elastic-coders/serverless-webpack)",
+  "license": "MIT"
+}
