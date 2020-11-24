@@ -38,19 +38,21 @@ const serverlessConfiguration: Serverless = {
     },
   },
   functions: {
-    // importFileParser: {
-    //   handler: 'handler.importFileParser',
-    //   events: [
-    //     {
-    //       s3: {
-    //         bucket: uploadBucketName,
-    //         event: 's3:ObjectCreated:*',
-    //         existing: true,
-    //         rules: [{ prefix: 'upload/', suffix: '.csv' }],
-    //       },
-    //     },
-    //   ],
-    // },
+    basicAuthorizer: {
+      handler: 'handler.basicAuthorizer',
+    },
+  },
+  resources: {
+    Resources: {},
+    Outputs: {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      BasicAuthorizerLambdaFunctionQualifiedArn: {
+        Export: {
+          Name: "basic-authorizer-arn",
+        },
+      },
+    },
   },
 };
 
