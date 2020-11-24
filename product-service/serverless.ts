@@ -148,7 +148,7 @@ const serverlessConfiguration: Serverless = {
             Ref: createProductTopic,
           },
           FilterPolicy: {
-            result: ['fail'],
+            result: ['error'],
           },
         },
       },
