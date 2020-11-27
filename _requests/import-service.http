@@ -1,1 +1,6 @@
 GET {{url}}/import?name=name
+#good
+#Authorization: Basic UmlkZ2VBOlRFU1RfUEFTU1dPUkQ=
+
+#bad
+#Authorization: Basic UmlkZ2VBOkJBRF9QQVNTV09SRA==
