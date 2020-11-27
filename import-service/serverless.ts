@@ -6,9 +6,7 @@ dotenv.config();
 const uploadBucketName = process.env.BUCKET;
 
 const serverlessConfiguration: Serverless = {
-  service: {
-    name: 'import-service',
-  },
+  service: 'import-service',
   package: {
     include: [],
   },
@@ -20,6 +18,9 @@ const serverlessConfiguration: Serverless = {
         forceExclude: 'aws-sdk',
       },
       // keepOutputDirectory: true,
+    },
+    authorizerArn: {
+      "Fn::ImportValue": "authorization-service-basic-authorizer-arn",
     },
   },
 
@@ -95,8 +96,7 @@ const serverlessConfiguration: Serverless = {
             },
             authorizer: {
               name: 'basic-authorizer',
-              // todo: remove hardcode
-              arn: 'arn:aws:lambda:eu-west-1:625494443472:function:authorization-service-dev-basicAuthorizer:7',
+              arn: '${self:custom.authorizerArn}',
             },
           },
         },

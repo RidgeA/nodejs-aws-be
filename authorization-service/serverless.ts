@@ -1,9 +1,7 @@
 import type { Serverless } from 'serverless/aws';
 
 const serverlessConfiguration: Serverless = {
-  service: {
-    name: 'authorization-service',
-  },
+  service: 'authorization-service',
   package: {
     include: [],
   },
@@ -49,7 +47,7 @@ const serverlessConfiguration: Serverless = {
       // @ts-ignore
       BasicAuthorizerLambdaFunctionQualifiedArn: {
         Export: {
-          Name: "basic-authorizer-arn",
+          Name: "${self:service}-basic-authorizer-arn",
         },
       },
     },
