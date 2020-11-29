@@ -8,7 +8,7 @@ export class Product {
   images: string[];
   count: number;
 
-  constructor(data?: Partial<Product>) {
+  constructor(data?: Partial<Omit<Product, 'id'>>) {
     if (data) {
       this.id = v4();
       this.title = data.title;

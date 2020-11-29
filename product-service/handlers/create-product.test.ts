@@ -1,13 +1,26 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda";
 import { isUUID } from "class-validator";
 import { StatusCodes } from "http-status-codes";
+import { container, DependencyContainer } from "tsyringe";
+import { Token } from "../di";
 import { NoopLogger } from "../infrastructure/logger";
 
 import { name } from '../package.json';
 import { createProductHandler } from "./create-product";
 
 describe(name, () => {
+
   describe('createProduct', () => {
+
+    let testContainer: DependencyContainer;
+
+    beforeEach(() => {
+      container.clearInstances();
+      testContainer = container.createChildContainer();
+      testContainer
+        .register(Token.Logger, { useValue: new NoopLogger() });
+    });
+
     it('should call repository to save a product', async () => {
 
       const product = {
@@ -18,11 +31,13 @@ describe(name, () => {
         images: ['https://image.com/picture.jpg'],
       };
 
-      const repo = {
+      const repository = {
         save: jest.fn().mockResolvedValue(product),
       };
 
-      const handler = createProductHandler(repo, new NoopLogger());
+      testContainer.register(Token.ProductRepository, { useValue: repository });
+
+      const handler = createProductHandler(testContainer);
 
       const event = {
         body: product,
@@ -31,7 +46,7 @@ describe(name, () => {
       const context = {} as Context;
       await handler(event, context, null);
 
-      expect(repo.save.mock.calls.length).toBe(1);
+      expect(repository.save.mock.calls.length).toBe(1);
 
     });
 
@@ -44,11 +59,13 @@ describe(name, () => {
         images: ['https://image.com/picture.jpg'],
       };
 
-      const repo = {
+      const repository = {
         save: jest.fn().mockResolvedValue(product),
       };
 
-      const handler = createProductHandler(repo, new NoopLogger());
+      testContainer.register(Token.ProductRepository, { useValue: repository });
+
+      const handler = createProductHandler(testContainer);
 
       const event = {
         body: product,
@@ -68,7 +85,6 @@ describe(name, () => {
       expect(actualBody).toHaveProperty('images', product.images);
     });
 
-
     it('should create a product without images', async () => {
       const product = {
         title: 'Product title',
@@ -77,11 +93,13 @@ describe(name, () => {
         price: 100,
       };
 
-      const repo = {
+      const repository = {
         save: jest.fn().mockResolvedValue(product),
       };
 
-      const handler = createProductHandler(repo, new NoopLogger());
+      testContainer.register(Token.ProductRepository, { useValue: repository });
+
+      const handler = createProductHandler(testContainer);
 
       const event = {
         body: product,
@@ -108,11 +126,13 @@ describe(name, () => {
         [property]: undefined,
       };
 
-      const repo = {
+      const repository = {
         save: jest.fn().mockRejectedValue(new Error('should not be called')),
       };
 
-      const handler = createProductHandler(repo, new NoopLogger());
+      testContainer.register(Token.ProductRepository, { useValue: repository });
+
+      const handler = createProductHandler(testContainer);
 
       const event = {
         body: product,
@@ -146,11 +166,13 @@ describe(name, () => {
         [property]: value,
       };
 
-      const repo = {
+      const repository = {
         save: jest.fn().mockRejectedValue(new Error('should not be called')),
       };
 
-      const handler = createProductHandler(repo, new NoopLogger());
+      testContainer.register(Token.ProductRepository, { useValue: repository });
+
+      const handler = createProductHandler(testContainer);
 
       const event = {
         body: product,
@@ -178,11 +200,13 @@ describe(name, () => {
         // change property
       };
 
-      const repo = {
+      const repository = {
         save: jest.fn().mockRejectedValue(new Error('should not be called')),
       };
 
-      const handler = createProductHandler(repo, new NoopLogger());
+      testContainer.register(Token.ProductRepository, { useValue: repository });
+
+      const handler = createProductHandler(testContainer);
 
       const event = {
         body: product,

@@ -1,1 +1,3 @@
-hello,world
+title,description,price,count,images
+product title 1,product description,1,1,https://images.com/picture1.jpg;https://images.com/picture2.jpg
+product title 2,product description,-1,1,https://images.com/picture1.jpg;https://images.com/picture2.jpg

@@ -1,13 +1,23 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda";
 import { StatusCodes } from 'http-status-codes';
+import { container, DependencyContainer } from "tsyringe";
+import { Product } from "../../models/product.model";
+import { Token } from "../di";
 import { NoopLogger } from "../infrastructure/logger";
 import { name } from '../package.json';
-import { Product } from "../../repository/product/product.model";
 import { getProductListHandler } from './get-product-list';
 
 describe(name, () => {
 
   describe('getProductList', () => {
+
+    let testContainer: DependencyContainer;
+
+    beforeEach(() => {
+      container.clearInstances();
+      testContainer = container.createChildContainer();
+      testContainer.register(Token.Logger, { useValue: new NoopLogger() });
+    });
 
     it('should return a list of products', async () => {
 
@@ -33,8 +43,9 @@ describe(name, () => {
           ]);
         },
       };
+      testContainer.register(Token.ProductRepository, { useValue: repository });
 
-      const handler = getProductListHandler(repository, new NoopLogger());
+      const handler = getProductListHandler(testContainer);
 
       const event = {} as APIGatewayProxyEvent;
       const context = {} as Context;
@@ -52,8 +63,9 @@ describe(name, () => {
           return Promise.reject(new Error('some error'));
         },
       };
+      testContainer.register(Token.ProductRepository, { useValue: repository });
 
-      const handler = getProductListHandler(repository, new NoopLogger());
+      const handler = getProductListHandler(testContainer);
 
       const event = {} as APIGatewayProxyEvent;
       const context = {} as Context;

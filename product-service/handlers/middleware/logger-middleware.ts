@@ -15,7 +15,7 @@ export const LoggerMiddleware = (logger: Logger): middy.MiddlewareObject<APIGate
         const statusCode = handler?.response?.statusCode;
         logger.log(`[${requestTime}] ${httpMethod} ${path} ${protocol} ${statusCode}`);
       } catch (e) {
-        console.log("DEADBEEF logger-middleware.ts 25: ", e);
+        console.log("Failed to log request:", e);
       }
       return next();
     },

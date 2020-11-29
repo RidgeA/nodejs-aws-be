@@ -21,7 +21,6 @@
     "uuid": "^8.3.1"
   },
   "devDependencies": {
-    "aws-sdk": "^2.784.0",
     "@types/node": "^12.19.4",
     "@types/serverless": "^1.72.5",
     "serverless-dotenv-plugin": "^3.1.0",

@@ -1,6 +1,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda";
 import { StatusCodes } from 'http-status-codes';
 import { NotFoundError } from "slonik";
+import { container, DependencyContainer } from "tsyringe";
+import { Token } from "../di";
 import { NoopLogger } from "../infrastructure/logger";
 import { name } from '../package.json';
 import { getProductByIdHandler } from './get-product-by-id';
@@ -8,6 +10,14 @@ import { getProductByIdHandler } from './get-product-by-id';
 describe(name, () => {
 
   describe('getProductById', () => {
+
+    let testContainer: DependencyContainer;
+
+    beforeEach(() => {
+      container.clearInstances();
+      testContainer = container.createChildContainer();
+      testContainer.register(Token.Logger, { useValue: new NoopLogger() });
+    });
 
     it('should return product', async () => {
 
@@ -21,8 +31,9 @@ describe(name, () => {
           id,
         }),
       };
+      testContainer.register(Token.ProductRepository, { useValue: repository });
 
-      const handler = getProductByIdHandler(repository, new NoopLogger());
+      const handler = getProductByIdHandler(testContainer);
 
       const event = { pathParameters: { id } } as unknown as APIGatewayProxyEvent;
       const context = {} as Context;
@@ -39,8 +50,9 @@ describe(name, () => {
       const repository = {
         findOne: jest.fn().mockRejectedValue(new NotFoundError()),
       };
+      testContainer.register(Token.ProductRepository, { useValue: repository });
 
-      const handler = getProductByIdHandler(repository, new NoopLogger());
+      const handler = getProductByIdHandler(testContainer);
 
       const event = { pathParameters: { id } } as unknown as APIGatewayProxyEvent;
       const context = {} as Context;
@@ -56,8 +68,9 @@ describe(name, () => {
       const repository = {
         findOne: jest.fn().mockRejectedValue(new Error('some error')),
       };
+      testContainer.register(Token.ProductRepository, { useValue: repository });
 
-      const handler = getProductByIdHandler(repository, new NoopLogger());
+      const handler = getProductByIdHandler(testContainer);
 
       const event = { pathParameters: { id } } as unknown as APIGatewayProxyEvent;
       const context = {} as Context;

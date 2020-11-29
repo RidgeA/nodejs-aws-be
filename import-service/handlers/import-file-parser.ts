@@ -1,63 +1,56 @@
-import middy from "@middy/core";
 import { S3Event, S3Handler } from "aws-lambda";
-import { S3 } from "aws-sdk";
 import parse from "csv-parser";
 import { pipeline, Writable } from "stream";
-import { container, DependencyContainer } from "tsyringe";
+import { DependencyContainer } from "tsyringe";
 import { promisify } from "util";
-import { Product } from "../../repository/product/product.model";
 import { Token } from "../di";
+import { ObjectStorage } from "../infrastructure/object-storage";
+import { ProductCreationSender } from "../infrastructure/product-creation-sender";
 
 const pipelineP = promisify(pipeline);
 
+// todo: move to a separate class
+// todo: add validation
+const writableSender = (sender: ProductCreationSender): Writable => {
+  return new Writable({
+    objectMode: true,
+    write(record: Record<string, unknown>, encoding: string, callback) {
+      const product = {
+        title: record.title as string,
+        description: record.description as string,
+        price: Number(record.price),
+        count: Number(record.count),
+        images: (record.images as string)?.split(';') ?? [],
+      };
+
+      sender.send(product)
+        .then(() => callback())
+        .catch(callback);
+    },
+  });
+};
+
 export function importFileParserHandler(c: DependencyContainer): S3Handler {
 
-  return middy(
-    async (event: S3Event/*, context*/) => {
+  const storage = c.resolve<ObjectStorage>(Token.ObjectStorage);
+  const sender = c.resolve<ProductCreationSender>(Token.ProductCreationSender);
 
-      const parser = parse();
-      const s3 = c.resolve<S3>(Token.S3);
+  return async (event: S3Event/*, context*/) => {
 
-      for (const record of event.Records) {
-        const bucketName = record.s3.bucket.name;
-        const key = record.s3.object.key;
-        const readStream = s3.getObject({
-          Bucket: bucketName,
-          Key: key,
-        }).createReadStream();
+    const parser = parse();
 
-        await pipelineP(
-          readStream,
-          parser,
-          new Writable({
-            objectMode: true,
-            write(record: Record<string, unknown>, encoding: string, callback) {
-              const product = new Product({
-                title: record.title as string,
-                description: record.description as string,
-                price: Number(record.price),
-                count: Number(record.count),
-                images: (record.images as string)?.split(';'),
-              });
-              console.log(product);
-              callback();
-            },
-          })
-        );
+    for (const record of event.Records) {
+      const bucketName = record.s3.bucket.name;
+      const key = record.s3.object.key;
+      const readStream = storage.readStream(bucketName, key);
 
-        await s3.copyObject({
-          Bucket: bucketName,
-          CopySource: `/${bucketName}/${key}`,
-          Key: key.replace('upload/', 'parsed/'),
-        }).promise();
+      await pipelineP(
+        readStream,
+        parser,
+        writableSender(sender),
+      );
 
-        await s3.deleteObject({
-          Bucket: bucketName,
-          Key: key,
-        }).promise();
-      }
+      await storage.moveWithinBucket(bucketName, key, key.replace('upload/', 'parsed/'));
     }
-  );
+  };
 }
-
-export const importFileParser: S3Handler = importFileParserHandler(container);
