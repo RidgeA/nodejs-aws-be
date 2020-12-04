@@ -6,9 +6,7 @@ dotenv.config();
 const uploadBucketName = process.env.BUCKET;
 
 const serverlessConfiguration: Serverless = {
-  service: {
-    name: 'import-service',
-  },
+  service: 'import-service',
   package: {
     include: [],
   },
@@ -20,6 +18,9 @@ const serverlessConfiguration: Serverless = {
         forceExclude: 'aws-sdk',
       },
       // keepOutputDirectory: true,
+    },
+    authorizerArn: {
+      "Fn::ImportValue": "authorization-service-basic-authorizer-arn",
     },
   },
 
@@ -93,6 +94,10 @@ const serverlessConfiguration: Serverless = {
                 },
               },
             },
+            authorizer: {
+              name: 'basic-authorizer',
+              arn: '${self:custom.authorizerArn}',
+            },
           },
         },
       ],
@@ -109,6 +114,24 @@ const serverlessConfiguration: Serverless = {
           },
         },
       ],
+    },
+  },
+  resources: {
+    Resources: {
+      GatewayResponse4XX: {
+        Type: "AWS::ApiGateway::GatewayResponse",
+        Properties: {
+          ResponseParameters: {
+            'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+            'gatewayresponse.header.Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+            'gatewayresponse.header.Access-Control-Allow-Methods': "'GET,OPTIONS'",
+          },
+          ResponseType: 'DEFAULT_4XX',
+          RestApiId: {
+            Ref: 'ApiGatewayRestApi',
+          },
+        },
+      },
     },
   },
 };
